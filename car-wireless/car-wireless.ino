@@ -20,6 +20,9 @@ void setup() {
   pinMode(ln3, OUTPUT);
   pinMode(ln4, OUTPUT);
 
+  // connect wifi
+  
+
 }
 
 void forward();

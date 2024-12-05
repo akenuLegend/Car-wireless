@@ -17,6 +17,13 @@ int ln2 = 4;
 int ln3 = 12;
 int ln4 = 13;
 
+int buttonFw = 0;
+int buttonBw = 0;
+int buttonTL = 0;
+int buttonTR = 0;
+
+int status = buttonFw + buttonBw + buttonTL + buttonTR;
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -37,6 +44,7 @@ void forward();
 void backward();
 void turnLeft();
 void turnRight();
+void stop();
 
 void loop(){                                                                                                                                                  
   // put your main code here, to run repeatedly:
@@ -44,68 +52,140 @@ void loop(){
     Serial.println("Mất kết nối WiFi, đang thử kết nối lại...");
     Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
   }
+
   Blynk.run();
+}
+
+BLYNK_WRITE(V0){
+  int power = param.asInt();
+  if(power == 1){
+    forward(240,255);
+    delay(3000);
+  }
+  stop();
 }
 
 BLYNK_WRITE(V1){
 
-  int buttonFw = param.asInt();
+  buttonFw = param.asInt();
+  status = buttonFw + buttonBw + buttonTL + buttonTR;
+  Serial.print("Status: ");
+  Serial.println(status);
+  if(status > 1){
+    if(buttonTR==1 && buttonFw == 1){
+      forward(80,240);
+      Serial.println("forward - right");
+    }
+    else if(buttonTL==1 && buttonFw == 1){
+      forward(240,80);
+      Serial.println("forward - left");    
+    }
+  }
+  if(status == 1){
+    if(buttonFw == 1 && ((buttonTR ==0 && buttonTL == 0))){
+      forward(140,150);
+      Serial.print("forward : ");
+      Serial.println(buttonFw);
+    }
+  }
+  if(status == 0) stop();
 
-  Serial.print("button forward : ");
-  Serial.println(buttonFw);
-  if(buttonFw == 1){
-    forward(140,150);
-  }
-  else{
-    forward(0,0);
-  }
   
 }
 
 BLYNK_WRITE(V2){
 
-  int buttonBw = param.asInt();
+  buttonBw = param.asInt();
+  status = buttonFw + buttonBw + buttonTL + buttonTR;
+  Serial.print("Status: ");
+  Serial.println(status);
+  if(status > 1){
+    if(buttonTR==1 && buttonBw == 1){
+      backward(80,240);
+      Serial.println("backward - right");
+    }
+    else if(buttonTL==1 && buttonBw == 1){
+      backward(240,80);
+      Serial.println("backrward - left");    
+    }
+  }
+  if(status == 1){
+    if(buttonBw == 1 && (buttonTR ==0 && buttonTL == 0)){
+        backward(145,150);
+        Serial.print("backward : ");
+        Serial.println(buttonBw);
+    }
+  }  
+  if(status == 0) stop();
 
-  Serial.print("button backward : ");
-  Serial.println(buttonBw);
-  if(buttonBw == 1){
-    backward(145,150);
-  }
-  else{
-    forward(0,0);
-  }
   
 }
 
 BLYNK_WRITE(V3){
 
-  int buttonTF = param.asInt();
+  buttonTL = param.asInt();
+  status = buttonFw + buttonBw + buttonTL + buttonTR;
+  Serial.print("Status: ");
+  Serial.println(status);
 
-  Serial.print("button turn left : ");
-  Serial.println(buttonTF);
-  if(buttonTF == 1){
-    turnLeft(100,130);
+  if(status >1){
+    if(buttonTL==1 && buttonFw == 1){
+      forward(240,80);
+      Serial.println("forward - left");
+    }
+    else if(buttonTL==1 && buttonBw == 1){
+      backward(240,80);
+      Serial.println("backward - left");
+    }
   }
-  else{
-    forward(0,0);
+  if(status == 1){
+    if(buttonTL == 1 && (buttonBw == 0 && buttonFw ==0)){
+      turnLeft(100,130);
+      Serial.println("turn left ");
+      Serial.println(buttonTL);
+    }
   }
-  
+  if(status == 0) stop();
 }
+
+  
+
 
 BLYNK_WRITE(V4){
 
-  int buttonTR = param.asInt();
+  buttonTR = param.asInt();
+  status = buttonFw + buttonBw + buttonTL + buttonTR;
+  Serial.print("Status: ");
+  Serial.println(status);
 
-  Serial.print("button turn right : ");
-  Serial.println(buttonTR);
-  if(buttonTR == 1){
-    turnRight(130,100);
+  if(status >1){
+    if(buttonTR==1 && buttonFw == 1){
+      forward(80,240);
+      Serial.println("forward - right");
+    }
+    else  if(buttonTR==1 && buttonBw == 1){
+      backward(80,240);
+      Serial.println("backward - right");
+    }
   }
-  else{
-    forward(0,0);
+  if(status ==1){
+    if(buttonTR == 1 && (buttonBw == 0 && buttonFw ==0)){
+      turnRight(130,100);
+      Serial.println("turn right ");
+      Serial.println(buttonTR);
+    }
   }
+  if(status == 0) stop();
+
   
 }
+
+void stop(){
+  Serial.println("Stop");
+  forward(0,0);
+}
+
+// (banh phai, banh trai)
 
 void forward (int pwmEnA, int pwmEnB) {
 

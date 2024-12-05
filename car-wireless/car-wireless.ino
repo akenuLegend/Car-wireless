@@ -1,13 +1,13 @@
-#define BLYNK_TEMPLATE_ID "TMPL6TFggeSyC"
+#define BLYNK_TEMPLATE_ID "your id"
 #define BLYNK_TEMPLATE_NAME "FIRST TEMPLATE"
-#define BLYNK_AUTH_TOKEN "pJ3mTZOZmNNNZuS8WPCfQqc1mQkzylAz"
+#define BLYNK_AUTH_TOKEN "your token"
 
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
 // Thông tin mạng Wi-Fi
 char ssid[] = "@@";
-char pass[] = "12345888";
+char pass[] = "pass";
 char auth[] = BLYNK_AUTH_TOKEN;
 
 int EnA = 16;
